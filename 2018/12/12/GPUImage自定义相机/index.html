@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="a blog record tidbits">
+    <meta name="keyword" content="">
+    <meta name="theme-color" content="#600090">
+    <meta name="msapplication-navbutton-color" content="#600090">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#600090">
+    <link rel="shortcut icon" href="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-person-128.png">
+    <link rel="alternate" type="application/atom+xml" title="Kira&#39;s Tidbits" href="/atom.xml">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.css">
+    <title>
+        
+        GPUImage 自定义相机｜Kira&#39;s Tidbits
+        
+    </title>
+
+    <link rel="canonical" href="https://shaqima123.github.io/2018/12/12/GPUImage自定义相机/">
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/blog-style.css">
+
+    <!-- Pygments Github CSS -->
+    <link rel="stylesheet" href="/css/syntax.css">
+</head>
+
+<style>
+
+    header.intro-header {
+        background-image: url('')
+    }
+</style>
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="" class="animated fadeIn">
+<!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top " id="nav-top" data-ispost = "true" data-istags="false
+" data-ishome = "false" >
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand animated pulse" href="/">
+                <span class="brand-logo">
+                    Kira&#39;s Tidbits
+                </span>
+                's Blog
+            </a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <!-- /.navbar-collapse -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+					
+                    
+                        
+							
+                        <li>
+                            <a href="/iOS/">iOS</a>
+                        </li>
+							
+						
+                    
+					
+					
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+//    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+<!-- Main Content -->
+
+<!--only post-->
+
+
+<img class="wechat-title-img"
+     src="">
+
+
+<style>
+    
+    header.intro-header {
+        background-image: url('')
+    }
+
+    
+</style>
+
+<header class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
+                <div class="post-heading">
+                    <h1>GPUImage 自定义相机</h1>
+                    
+                    <span class="meta">
+                         作者 Kira
+                        <span>
+                          日期 2018-12-12
+                         </span>
+                    </span>
+                    <div class="tags text-center">
+                        
+                        <a class="tag" href="/tags/#iOS"
+                           title="iOS">iOS</a>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="post-title-haojen">
+        <span>
+            GPUImage 自定义相机
+        </span>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+            <!-- Post Container -->
+            <div class="col-lg-8 col-lg-offset-1 col-sm-9 post-container">
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><ul>
+<li>这是基于第三方库GPUImage实现的自定义相机，主要是功能方面的实现,在UI上暂时并没有做很好的完善。主要包括功能有实时滤镜，准确聚焦，调整焦距，调整曝光，闪光灯设置，翻转前后相机以及拍照后的滤镜调整等</li>
+</ul>
+<h1 id="引入GPUImage库"><a href="#引入GPUImage库" class="headerlink" title="引入GPUImage库"></a>引入GPUImage库</h1><ul>
+<li>主要有工程以依赖的形式加入GPUImage或者用Pod安装GPUImage的方法，网上类似教程很多，这里就不赘述了</li>
+</ul>
+<h1 id="制作自定义相机"><a href="#制作自定义相机" class="headerlink" title="制作自定义相机"></a>制作自定义相机</h1><h2 id="新建一个CameraViewController-作为实时相机界面的Controller-并且做以下预处理及声明变量"><a href="#新建一个CameraViewController-作为实时相机界面的Controller-并且做以下预处理及声明变量" class="headerlink" title="新建一个CameraViewController,作为实时相机界面的Controller,并且做以下预处理及声明变量"></a>新建一个CameraViewController,作为实时相机界面的Controller,并且做以下预处理及声明变量</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#define HEIGHT 667.0</span><br><span class="line">#define WIDTH 375.0</span><br><span class="line">static int CameraFilterCount = 9;//滤镜的数量</span><br><span class="line"></span><br><span class="line">///滤镜View的显示状态</span><br><span class="line">typedef NS_ENUM(NSInteger, FilterViewState) &#123;</span><br><span class="line"></span><br><span class="line">FilterViewHidden,/**&lt;隐藏*/</span><br><span class="line"></span><br><span class="line">FilterViewUsing /**&lt;显示*/</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">///闪光灯状态</span><br><span class="line">typedef NS_ENUM(NSInteger, CameraManagerFlashMode) &#123;</span><br><span class="line"></span><br><span class="line">CameraManagerFlashModeAuto, /**&lt;自动*/</span><br><span class="line"></span><br><span class="line">CameraManagerFlashModeOff, /**&lt;关闭*/</span><br><span class="line"></span><br><span class="line">CameraManagerFlashModeOn /**&lt;打开*/</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">@interface CameraViewController() &lt;UIGestureRecognizerDelegate&gt;</span><br><span class="line">&#123;</span><br><span class="line">CALayer *_focusLayer; //聚焦层</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">///新建相机cameraManager</span><br><span class="line">@property (nonatomic,strong) GPUImageStillCamera *cameraManager;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line">*根据storyboard上将界面分为三个View，预览View，底部View以及整体的cameraView,也可以用代码实现</span><br><span class="line">*/</span><br><span class="line">@property (strong, nonatomic) IBOutlet UIView *cameraView;</span><br><span class="line">@property (weak, nonatomic) IBOutlet UIView *preview;</span><br><span class="line">@property (weak, nonatomic) IBOutlet UIView *bottomView;</span><br><span class="line"></span><br><span class="line">@property CameraFilterView *cameraFilterView;//自定义滤镜视图</span><br><span class="line"></span><br><span class="line">@property (nonatomic , assign) CameraManagerFlashMode flashMode;</span><br><span class="line">@property (nonatomic , assign) FilterViewState filterViewState;</span><br><span class="line"></span><br><span class="line">@property (nonatomic , weak) IBOutlet UIButton *flashButton;//闪光灯按钮</span><br><span class="line"></span><br><span class="line">@property (nonatomic , assign) CGFloat beginGestureScale;//开始的缩放比例</span><br><span class="line">@property (nonatomic , assign) CGFloat effectiveScale;//最后的缩放比例</span><br><span class="line"></span><br><span class="line">@property GPUImageOutput *filter;//滤镜</span><br><span class="line">@property GPUImageView *filterView;//实时滤镜预览视图</span><br><span class="line">@property AVCaptureStillImageOutput *photoOutput;//用于保存原图</span><br><span class="line"></span><br><span class="line">@property CheckViewController *checkVC;//拍照之后跳转的ViewController</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<h2 id="控制器视图方法"><a href="#控制器视图方法" class="headerlink" title="控制器视图方法"></a>控制器视图方法</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (void)viewDidLoad&#123;</span><br><span class="line">//隐藏导航栏</span><br><span class="line">[self.navigationController setNavigationBarHidden:YES];</span><br><span class="line">//从SB初始化CheckController，后续解释FilterCode</span><br><span class="line">_checkVC = [[self storyboard] instantiateViewControllerWithIdentifier:@&quot;Check&quot;];</span><br><span class="line">[_checkVC setFilterCode:0];</span><br><span class="line"></span><br><span class="line">//初始化相机，默认为前置相机</span><br><span class="line">_cameraManager = [[MyCamera alloc] initWithSessionPreset:AVCaptureSessionPresetPhoto cameraPosition:AVCaptureDevicePositionFront];</span><br><span class="line">_cameraManager.outputImageOrientation = UIInterfaceOrientationPortrait;//设置照片的方向为设备的定向</span><br><span class="line">_cameraManager.horizontallyMirrorFrontFacingCamera = YES;//设置是否为镜像</span><br><span class="line">_cameraManager.horizontallyMirrorRearFacingCamera = NO;</span><br><span class="line"></span><br><span class="line">_filter = [[GPUImageFilter alloc] init];//初始化滤镜，默认初始化为原图GPUImageFilter</span><br><span class="line"></span><br><span class="line">[self setfocusImage:[UIImage imageNamed:@&quot;touch_focus_x&quot;]];//初始化聚焦图片</span><br><span class="line">/**</span><br><span class="line">*设置cameraManager的输出对象为filter,然后将preview强制转换为filterView添加到filter的输出对象中，这样在filterView中显示的就是相机捕捉到的并且经过filter滤镜处理的实时图像了</span><br><span class="line">*/</span><br><span class="line">[self.cameraManager addTarget:_filter];</span><br><span class="line">_filterView = (GPUImageView *)self.preview;</span><br><span class="line">[_filter addTarget:_filterView];</span><br><span class="line"></span><br><span class="line">//初始化闪光灯模式为Auto</span><br><span class="line">[self setFlashMode:CameraManagerFlashModeAuto];</span><br><span class="line">//默认滤镜视图为隐藏，就是点击滤镜的按钮才会出现让你选择滤镜的那个小视图</span><br><span class="line">[self setFilterViewState:FilterViewHidden];</span><br><span class="line">//初始化开始及结束的缩放比例都为1.0</span><br><span class="line">[self setBeginGestureScale:1.0f];</span><br><span class="line">[self setEffectiveScale:1.0f];</span><br><span class="line">//启动相机捕获</span><br><span class="line">[self.cameraManager startCameraCapture];&#125;</span><br></pre></td></tr></table></figure>
+<p>##UI方法</p>
+<ul>
+<li>这里先给出CameraFilterView的实现方法，其实就是一个简单的一行的CollectionView，博主比较懒，引用了<a href="http://www.jianshu.com/p/b1d3ef7fdf7a" target="_blank" rel="noopener">ShawnDu大哥的代码</a>，在此表示感谢🙏</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">///.h文件</span><br><span class="line">#import &lt;UIKit/UIKit.h&gt;</span><br><span class="line"></span><br><span class="line">@protocol CameraFilterViewDelegate;</span><br><span class="line"></span><br><span class="line">@interface CameraFilterView : UICollectionView &lt;UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout&gt;</span><br><span class="line"></span><br><span class="line">@property (strong, nonatomic) NSMutableArray *picArray;//图片数组</span><br><span class="line">@property (strong, nonatomic) id &lt;CameraFilterViewDelegate&gt; cameraFilterDelegate;</span><br><span class="line">@end</span><br><span class="line"></span><br><span class="line">@protocol CameraFilterViewDelegate &lt;NSObject&gt;</span><br><span class="line"></span><br><span class="line">- (void)switchCameraFilter:(NSInteger)index;//滤镜选择方法</span><br><span class="line"></span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">\\\.m文件</span><br><span class="line">#import &quot;CameraFilterView.h&quot;</span><br><span class="line">static const float CELL_HEIGHT = 84.0f;</span><br><span class="line">static const float CELL_WIDTH = 56.0f;</span><br><span class="line">@implementation CameraFilterView</span><br><span class="line"></span><br><span class="line">#pragma mark 初始化方法</span><br><span class="line"></span><br><span class="line">- (id)initWithFrame:(CGRect)frame collectionViewLayout:(UICollectionViewLayout *)layout&#123;</span><br><span class="line">self = [super initWithFrame:frame collectionViewLayout:layout];</span><br><span class="line">if (self) &#123;</span><br><span class="line">self.delegate = self;</span><br><span class="line">self.dataSource = self;</span><br><span class="line">&#125;</span><br><span class="line">return self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">#pragma mark collection 方法</span><br><span class="line">-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView</span><br><span class="line">&#123;</span><br><span class="line">return 1;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section&#123;</span><br><span class="line">return [_picArray count];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath&#123;</span><br><span class="line">static NSString *identifier = @&quot;cameraFilterCellID&quot;;</span><br><span class="line">[collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:identifier];</span><br><span class="line">UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identifier forIndexPath:indexPath];</span><br><span class="line">UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, CELL_WIDTH, CELL_HEIGHT)];</span><br><span class="line">imageView.image = [_picArray objectAtIndex:indexPath.row];</span><br><span class="line">[cell addSubview:imageView];</span><br><span class="line">cell.backgroundColor = [UIColor whiteColor];</span><br><span class="line"></span><br><span class="line">return cell;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath&#123;</span><br><span class="line">return CGSizeMake(CELL_WIDTH, CELL_HEIGHT);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath&#123;</span><br><span class="line">[_cameraFilterDelegate switchCameraFilter:indexPath.row];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath</span><br><span class="line">&#123;</span><br><span class="line">return YES;</span><br><span class="line">&#125;</span><br><span class="line">@end</span><br></pre></td></tr></table></figure>
+<ul>
+<li>关于Collection控件不懂的同学可以先复习一下CollectionView或者用其他的方法实现自定义控件</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">//添加滤镜视图到主视图上</span><br><span class="line">- (void)addCameraFilterView &#123;</span><br><span class="line">UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];</span><br><span class="line">layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;</span><br><span class="line">_cameraFilterView = [[CameraFilterView alloc] initWithFrame:CGRectMake(0, HEIGHT - _bottomView.frame.size.height - (WIDTH-4)/5 - 4, WIDTH, (WIDTH-4)/5) collectionViewLayout:layout];</span><br><span class="line">NSMutableArray *filterNameArray = [[NSMutableArray alloc] initWithCapacity:CameraFilterCount];</span><br><span class="line">for (NSInteger index = 0; index &lt; CameraFilterCount; index++) &#123;</span><br><span class="line">UIImage *image = [UIImage imageNamed:@&quot;girl&quot;];</span><br><span class="line">[filterNameArray addObject:image];</span><br><span class="line">&#125;</span><br><span class="line">_cameraFilterView.cameraFilterDelegate = self;</span><br><span class="line">_cameraFilterView.picArray = filterNameArray;</span><br><span class="line">[self.view addSubview:_cameraFilterView];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//使用滤镜</span><br><span class="line">- (IBAction)useFilter:(id)sender &#123;</span><br><span class="line">if (self.filterViewState == FilterViewHidden) &#123;</span><br><span class="line">[self addCameraFilterView];</span><br><span class="line">[self setFilterViewState:FilterViewUsing];</span><br><span class="line">&#125;</span><br><span class="line">else &#123;</span><br><span class="line">[_cameraFilterView removeFromSuperview];</span><br><span class="line">[self setFilterViewState:FilterViewHidden];</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//设置聚焦图片</span><br><span class="line">- (void)setfocusImage:(UIImage *)focusImage &#123;</span><br><span class="line">if (!focusImage) return;</span><br><span class="line"></span><br><span class="line">if (!_focusLayer) &#123;</span><br><span class="line">//增加tap手势，用于聚焦及曝光</span><br><span class="line">UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(focus:)];</span><br><span class="line">[self.preview addGestureRecognizer:tap];</span><br><span class="line">//增加pinch手势，用于调整焦距   </span><br><span class="line">UIPinchGestureRecognizer *pinch = [[UIPinchGestureRecognizer alloc] initWithTarget:self action:@selector(focusDisdance:)];</span><br><span class="line">[self.preview addGestureRecognizer:pinch];</span><br><span class="line">pinch.delegate = self;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, focusImage.size.width, focusImage.size.height)];</span><br><span class="line">imageView.image = focusImage;</span><br><span class="line">CALayer *layer = imageView.layer;</span><br><span class="line">layer.hidden = YES;</span><br><span class="line">[self.preview.layer addSublayer:layer];</span><br><span class="line">_focusLayer = layer;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//点击闪光灯按钮</span><br><span class="line">- (IBAction)changeFlash:(id)sender &#123;</span><br><span class="line">[self changeFlashMode:_flashButton];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>##滤镜选择方法的实现<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line">*以下的滤镜是GPUImage自带的滤镜，后面有几个效果不是很明显，我只是拿来做测试用。</span><br><span class="line">*GPUImage自带的滤镜很多，大家可以都试试看，当然也可以自己写滤镜，这就需要后续深入学习了</span><br><span class="line">*对checkViewController中filtercode属性的说明：filtercode是在选择滤镜的时候设置，</span><br><span class="line">*在拍照的时候传值给CheckViewController，实际上拍照传递给CheckVC的是原图加上当前设置的filtercode，</span><br><span class="line">*所以在后续CheckVC中改变滤镜的时候是基于原图进行改变。</span><br><span class="line">*/</span><br><span class="line">- (void)switchCameraFilter:(NSInteger)index &#123;</span><br><span class="line">[self.cameraManager removeAllTargets];</span><br><span class="line">switch (index) &#123;</span><br><span class="line">case 0:</span><br><span class="line">_filter = [[GPUImageFilter alloc] init];//原图</span><br><span class="line">[_checkVC setFilterCode:0];</span><br><span class="line">break;</span><br><span class="line">case 1:</span><br><span class="line">_filter = [[GPUImageHueFilter alloc] init];//绿巨人</span><br><span class="line">[_checkVC setFilterCode:1];</span><br><span class="line">break;</span><br><span class="line">case 2:</span><br><span class="line">_filter = [[GPUImageColorInvertFilter alloc] init];//负片</span><br><span class="line">[_checkVC setFilterCode:2];</span><br><span class="line">break;</span><br><span class="line">case 3:</span><br><span class="line">_filter = [[GPUImageSepiaFilter alloc] init];//老照片</span><br><span class="line">[_checkVC setFilterCode:3];</span><br><span class="line">break;</span><br><span class="line">case 4: &#123;</span><br><span class="line">_filter = [[GPUImageGaussianBlurPositionFilter alloc] init];</span><br><span class="line">[(GPUImageGaussianBlurPositionFilter*)_filter setBlurRadius:40.0/320.0];</span><br><span class="line">[_checkVC setFilterCode:4];</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line">case 5:</span><br><span class="line">_filter = [[GPUImageSketchFilter alloc] init];//素描</span><br><span class="line">[_checkVC setFilterCode:5];</span><br><span class="line">break;</span><br><span class="line">case 6:</span><br><span class="line">_filter = [[GPUImageVignetteFilter alloc] init];//黑晕</span><br><span class="line">[_checkVC setFilterCode:6];</span><br><span class="line">break;</span><br><span class="line">case 7:</span><br><span class="line">_filter = [[GPUImageGrayscaleFilter alloc] init];//灰度</span><br><span class="line">[_checkVC setFilterCode:7];</span><br><span class="line">break;</span><br><span class="line">case 8:</span><br><span class="line">_filter = [[GPUImageToonFilter alloc] init];//卡通效果 黑色粗线描边</span><br><span class="line">[_checkVC setFilterCode:8];</span><br><span class="line">default:</span><br><span class="line">_filter = [[GPUImageFilter alloc] init];</span><br><span class="line">[_checkVC setFilterCode:9];</span><br><span class="line">break;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[self.cameraManager addTarget:_filter];</span><br><span class="line">[_filter addTarget:_filterView];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="拍照方法的实现"><a href="#拍照方法的实现" class="headerlink" title="拍照方法的实现"></a>拍照方法的实现</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (IBAction)takePhoto:(id)sender &#123;</span><br><span class="line">_photoOutput = [_cameraManager getPhotoOutput];//得到源数据输出流</span><br><span class="line">NSDictionary * outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:AVVideoCodecJPEG,AVVideoCodecKey, nil];</span><br><span class="line">//这是输出流的设置参数AVVideoCodecJPEG参数表示以JPEG的图片格式输出图片</span><br><span class="line">[_photoOutput setOutputSettings:outputSettings];</span><br><span class="line">AVCaptureConnection *captureConnection=[_photoOutput connectionWithMediaType:AVMediaTypeVideo];</span><br><span class="line">//根据连接取得设备输出的数据</span><br><span class="line">[_photoOutput captureStillImageAsynchronouslyFromConnection:captureConnection completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) &#123;</span><br><span class="line">if (imageDataSampleBuffer) &#123;</span><br><span class="line">NSData *imageData=[AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];</span><br><span class="line">UIImage *image=[UIImage imageWithData:imageData];</span><br><span class="line">//将输出流数据转换成NSData，然后通过NSData将数据转换为UIImage传递给checkVC</span><br><span class="line">_checkVC.image = image;</span><br><span class="line">[self.navigationController pushViewController:_checkVC animated:YES];</span><br><span class="line">&#125;  </span><br><span class="line">&#125;];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="转置摄像头"><a href="#转置摄像头" class="headerlink" title="转置摄像头"></a>转置摄像头</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#pragma mark 转置摄像头</span><br><span class="line"></span><br><span class="line">- (IBAction)turn:(id)sender &#123;</span><br><span class="line">[self.cameraManager stopCameraCapture];</span><br><span class="line">if (_cameraManager.cameraPosition == AVCaptureDevicePositionFront) &#123;</span><br><span class="line">[_cameraManager initWithSessionPreset:AVCaptureSessionPresetPhoto cameraPosition:AVCaptureDevicePositionBack];</span><br><span class="line">&#125;</span><br><span class="line">else if(_cameraManager.cameraPosition == AVCaptureDevicePositionBack)</span><br><span class="line">&#123;</span><br><span class="line">[_cameraManager initWithSessionPreset:AVCaptureSessionPresetPhoto cameraPosition:AVCaptureDevicePositionFront];</span><br><span class="line">&#125;</span><br><span class="line">_cameraManager.outputImageOrientation = UIInterfaceOrientationPortrait;</span><br><span class="line">_cameraManager.horizontallyMirrorFrontFacingCamera = YES;</span><br><span class="line">_cameraManager.horizontallyMirrorRearFacingCamera = NO;</span><br><span class="line"></span><br><span class="line">[self.cameraManager addTarget:_filter];</span><br><span class="line">_filterView = (GPUImageView *)self.preview;</span><br><span class="line">[_filter addTarget:_filterView];</span><br><span class="line"></span><br><span class="line">[self setBeginGestureScale:1.0f];//在转换摄像头的时候把摄像头的焦距调回1.0</span><br><span class="line">[self setEffectiveScale:1.0f];</span><br><span class="line"></span><br><span class="line">[self.cameraManager startCameraCapture];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="调整焦距"><a href="#调整焦距" class="headerlink" title="调整焦距"></a>调整焦距</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">//调整焦距方法</span><br><span class="line">-(void)focusDisdance:(UIPinchGestureRecognizer*)pinch &#123;</span><br><span class="line">self.effectiveScale = self.beginGestureScale * pinch.scale;</span><br><span class="line">if (self.effectiveScale &lt; 1.0f) &#123;</span><br><span class="line">self.effectiveScale = 1.0f;</span><br><span class="line">&#125;</span><br><span class="line">CGFloat maxScaleAndCropFactor = 3.0f;//设置最大放大倍数为3倍</span><br><span class="line">if (self.effectiveScale &gt; maxScaleAndCropFactor)</span><br><span class="line">self.effectiveScale = maxScaleAndCropFactor;</span><br><span class="line">[CATransaction begin];</span><br><span class="line">[CATransaction setAnimationDuration:.025];</span><br><span class="line">NSError *error;</span><br><span class="line">if([self.cameraManager.inputCamera lockForConfiguration:&amp;error])&#123;</span><br><span class="line">[self.cameraManager.inputCamera setVideoZoomFactor:self.effectiveScale];</span><br><span class="line">[self.cameraManager.inputCamera unlockForConfiguration];</span><br><span class="line">&#125;</span><br><span class="line">else &#123;</span><br><span class="line">NSLog(@&quot;ERROR = %@&quot;, error);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[CATransaction commit];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//手势代理方法</span><br><span class="line">- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer</span><br><span class="line">&#123;</span><br><span class="line">if ( [gestureRecognizer isKindOfClass:[UIPinchGestureRecognizer class]] ) &#123;</span><br><span class="line">self.beginGestureScale = self.effectiveScale;</span><br><span class="line">&#125;</span><br><span class="line">return YES;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>##对焦<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">//对焦方法</span><br><span class="line">- (void)focus:(UITapGestureRecognizer *)tap &#123;</span><br><span class="line">self.preview.userInteractionEnabled = NO;</span><br><span class="line">CGPoint touchPoint = [tap locationInView:tap.view];</span><br><span class="line">// CGContextRef *touchContext = UIGraphicsGetCurrentContext();</span><br><span class="line">[self layerAnimationWithPoint:touchPoint];</span><br><span class="line">/**</span><br><span class="line">*下面是照相机焦点坐标轴和屏幕坐标轴的映射问题，这个坑困惑了我好久，花了各种方案来解决这个问题，以下是最简单的解决方案也是最准确的坐标转换方式</span><br><span class="line">*/</span><br><span class="line">if(_cameraManager.cameraPosition == AVCaptureDevicePositionBack)&#123;</span><br><span class="line">touchPoint = CGPointMake( touchPoint.y /tap.view.bounds.size.height ,1-touchPoint.x/tap.view.bounds.size.width);</span><br><span class="line">&#125;</span><br><span class="line">else</span><br><span class="line">touchPoint = CGPointMake(touchPoint.y /tap.view.bounds.size.height ,touchPoint.x/tap.view.bounds.size.width);</span><br><span class="line">/*以下是相机的聚焦和曝光设置，前置不支持聚焦但是可以曝光处理，后置相机两者都支持，下面的方法是通过点击一个点同时设置聚焦和曝光，当然根据需要也可以分开进行处理</span><br><span class="line">*/</span><br><span class="line">if([self.cameraManager.inputCamera isExposurePointOfInterestSupported] &amp;&amp; [self.cameraManager.inputCamera isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure])</span><br><span class="line">&#123;</span><br><span class="line">NSError *error;</span><br><span class="line">if ([self.cameraManager.inputCamera lockForConfiguration:&amp;error]) &#123;</span><br><span class="line">[self.cameraManager.inputCamera setExposurePointOfInterest:touchPoint];</span><br><span class="line">[self.cameraManager.inputCamera setExposureMode:AVCaptureExposureModeContinuousAutoExposure];</span><br><span class="line">if ([self.cameraManager.inputCamera isFocusPointOfInterestSupported] &amp;&amp; [self.cameraManager.inputCamera isFocusModeSupported:AVCaptureFocusModeAutoFocus]) &#123;</span><br><span class="line">[self.cameraManager.inputCamera setFocusPointOfInterest:touchPoint];</span><br><span class="line">[self.cameraManager.inputCamera setFocusMode:AVCaptureFocusModeAutoFocus];</span><br><span class="line">&#125;</span><br><span class="line">[self.cameraManager.inputCamera unlockForConfiguration];</span><br><span class="line">&#125; else &#123;</span><br><span class="line">NSLog(@&quot;ERROR = %@&quot;, error);</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//对焦动画</span><br><span class="line">- (void)layerAnimationWithPoint:(CGPoint)point &#123;</span><br><span class="line">if (_focusLayer) &#123;</span><br><span class="line">///聚焦点聚焦动画设置</span><br><span class="line">CALayer *focusLayer = _focusLayer;</span><br><span class="line">focusLayer.hidden = NO;</span><br><span class="line">[CATransaction begin];</span><br><span class="line">[CATransaction setDisableActions:YES];</span><br><span class="line">[focusLayer setPosition:point];</span><br><span class="line">focusLayer.transform = CATransform3DMakeScale(2.0f,2.0f,1.0f);</span><br><span class="line">[CATransaction commit];</span><br><span class="line"></span><br><span class="line">CABasicAnimation *animation = [ CABasicAnimation animationWithKeyPath: @&quot;transform&quot; ];</span><br><span class="line">animation.toValue = [ NSValue valueWithCATransform3D: CATransform3DMakeScale(1.0f,1.0f,1.0f)];</span><br><span class="line">animation.delegate = self;</span><br><span class="line">animation.duration = 0.3f;</span><br><span class="line">animation.repeatCount = 1;</span><br><span class="line">animation.removedOnCompletion = NO;</span><br><span class="line">animation.fillMode = kCAFillModeForwards;</span><br><span class="line">[focusLayer addAnimation: animation forKey:@&quot;animation&quot;];</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//动画的delegate方法</span><br><span class="line">- (void)animationDidStop:(CAAnimation *)anim finished:(BOOL)flag &#123;</span><br><span class="line">//    1秒钟延时</span><br><span class="line">[self performSelector:@selector(focusLayerNormal) withObject:self afterDelay:0.5f];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//focusLayer回到初始化状态</span><br><span class="line">- (void)focusLayerNormal &#123;</span><br><span class="line">self.preview.userInteractionEnabled = YES;</span><br><span class="line">_focusLayer.hidden = YES;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>##闪光灯设置<br><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">//设置闪光灯模式</span><br><span class="line"></span><br><span class="line">- (void)setFlashMode:(CameraManagerFlashMode)flashMode &#123;</span><br><span class="line">_flashMode = flashMode;</span><br><span class="line"></span><br><span class="line">switch (flashMode) &#123;</span><br><span class="line">case CameraManagerFlashModeAuto: &#123;</span><br><span class="line">[self.cameraManager.inputCamera lockForConfiguration:nil];</span><br><span class="line">if ([self.cameraManager.inputCamera isFlashModeSupported:AVCaptureFlashModeAuto]) &#123;</span><br><span class="line">[self.cameraManager.inputCamera setFlashMode:AVCaptureFlashModeAuto];</span><br><span class="line">&#125;</span><br><span class="line">[self.cameraManager.inputCamera unlockForConfiguration];</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line">case CameraManagerFlashModeOff: &#123;</span><br><span class="line">[self.cameraManager.inputCamera lockForConfiguration:nil];</span><br><span class="line">[self.cameraManager.inputCamera setFlashMode:AVCaptureFlashModeOff];</span><br><span class="line">[self.cameraManager.inputCamera unlockForConfiguration];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">break;</span><br><span class="line">case CameraManagerFlashModeOn: &#123;</span><br><span class="line">[self.cameraManager.inputCamera lockForConfiguration:nil];</span><br><span class="line">[self.cameraManager.inputCamera setFlashMode:AVCaptureFlashModeOn];</span><br><span class="line">[self.cameraManager.inputCamera unlockForConfiguration];</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line"></span><br><span class="line">default:</span><br><span class="line">break;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#pragma mark 改变闪光灯状态</span><br><span class="line">- (void)changeFlashMode:(UIButton *)button &#123;</span><br><span class="line">switch (self.flashMode) &#123;</span><br><span class="line">case CameraManagerFlashModeAuto:</span><br><span class="line">self.flashMode = CameraManagerFlashModeOn;</span><br><span class="line">[button setImage:[UIImage imageNamed:@&quot;flashing_on&quot;] forState:UIControlStateNormal];</span><br><span class="line">break;</span><br><span class="line">case CameraManagerFlashModeOff:</span><br><span class="line">self.flashMode = CameraManagerFlashModeAuto;</span><br><span class="line">[button setImage:[UIImage imageNamed:@&quot;flashing_auto&quot;] forState:UIControlStateNormal];</span><br><span class="line">break;</span><br><span class="line">case CameraManagerFlashModeOn:</span><br><span class="line">self.flashMode = CameraManagerFlashModeOff;</span><br><span class="line">[button setImage:[UIImage imageNamed:@&quot;flashing_off&quot;] forState:UIControlStateNormal];</span><br><span class="line">break;</span><br><span class="line"></span><br><span class="line">default:</span><br><span class="line">break;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="对拍照之后的照片进行滤镜处理"><a href="#对拍照之后的照片进行滤镜处理" class="headerlink" title="对拍照之后的照片进行滤镜处理"></a>对拍照之后的照片进行滤镜处理</h1><ul>
+<li>这个其实很简单，处理方案和之前的实时滤镜差不多，也是通过FilterController来实现滤镜的选择，下面就给出选择滤镜之后进行处理的函数</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">- (void)switchCameraFilter:(NSInteger)index &#123;</span><br><span class="line">UIImage *inputImage = self.image;</span><br><span class="line">switch (index) &#123;</span><br><span class="line">case 0:</span><br><span class="line">_filter = [[GPUImageFilter alloc] init];//原图</span><br><span class="line">break;</span><br><span class="line">case 1:</span><br><span class="line">_filter = [[GPUImageHueFilter alloc] init];//绿巨人</span><br><span class="line">break;</span><br><span class="line">case 2:</span><br><span class="line">_filter = [[GPUImageColorInvertFilter alloc] init];//负片</span><br><span class="line">break;</span><br><span class="line">case 3:</span><br><span class="line">_filter = [[GPUImageSepiaFilter alloc] init];//老照片</span><br><span class="line">break;</span><br><span class="line">case 4: &#123;</span><br><span class="line">_filter = [[GPUImageGaussianBlurPositionFilter alloc] init];</span><br><span class="line">[(GPUImageGaussianBlurPositionFilter*)_filter setBlurRadius:40.0/320.0];</span><br><span class="line">&#125;</span><br><span class="line">break;</span><br><span class="line">case 5:</span><br><span class="line">_filter = [[GPUImageMedianFilter alloc] init];</span><br><span class="line">break;</span><br><span class="line">case 6:</span><br><span class="line">_filter = [[GPUImageVignetteFilter alloc] init];//黑晕</span><br><span class="line">break;</span><br><span class="line">case 7:</span><br><span class="line">_filter = [[GPUImageKuwaharaRadius3Filter alloc] init];</span><br><span class="line">break;</span><br><span class="line">case 8:</span><br><span class="line">_filter = [[GPUImageBilateralFilter alloc] init];</span><br><span class="line">default:</span><br><span class="line">_filter = [[GPUImageFilter alloc] init];</span><br><span class="line">break;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">//到这里为止和实时滤镜的处理都一样，不一样的就只有下面几句</span><br><span class="line">[_filter forceProcessingAtSize:inputImage.size];</span><br><span class="line">[_filter useNextFrameForImageCapture];</span><br><span class="line"></span><br><span class="line">GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithImage:inputImage smoothlyScaleOutput:YES];</span><br><span class="line"></span><br><span class="line">[stillImageSource addTarget:_filter];</span><br><span class="line"></span><br><span class="line">[stillImageSource processImage];</span><br><span class="line"></span><br><span class="line">_currentImage = [_filter imageFromCurrentFramebuffer];</span><br><span class="line">//这里得到的currentImage就是添加了滤镜之后的照片，可以放在imageView中直接显示，也可以稍加处理保存到相册</span><br><span class="line">[self.imageView setImage:_currentImage];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>#总结</p>
+<ul>
+<li>以上是最近在做自定义相机时做的一点总结，之前在做的时候也查阅了很多文章，感觉相对比较分散，所以这里就稍微做一下整理，希望大家在做类似需求的开发时能少碰到点坑。当然我做的也不怎么完善，风格也比较杂乱，后续会对此做些改进。</li>
+<li>有什么不对的地方欢迎大家批评指正，共同学习</li>
+</ul>
+
+                <hr>
+                
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2018/12/12/GPUImage 自定义相机/" data-toggle="tooltip" data-placement="top"
+                           title="">&larr; Previous Post</a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2018/06/19/hello-world/" data-toggle="tooltip" data-placement="top"
+                           title="Hello World Kira">Next Post &rarr;</a>
+                    </li>
+                    
+                </ul>
+
+                
+
+                
+
+
+                <!--加入新的评论系统-->
+                
+
+                
+
+            </div>
+
+            <div class="hidden-xs col-sm-3 toc-col">
+                <div class="toc-wrap">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#引入GPUImage库"><span class="toc-text">引入GPUImage库</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#制作自定义相机"><span class="toc-text">制作自定义相机</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#新建一个CameraViewController-作为实时相机界面的Controller-并且做以下预处理及声明变量"><span class="toc-text">新建一个CameraViewController,作为实时相机界面的Controller,并且做以下预处理及声明变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#控制器视图方法"><span class="toc-text">控制器视图方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#拍照方法的实现"><span class="toc-text">拍照方法的实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#转置摄像头"><span class="toc-text">转置摄像头</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#调整焦距"><span class="toc-text">调整焦距</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#对拍照之后的照片进行滤镜处理"><span class="toc-text">对拍照之后的照片进行滤镜处理</span></a></li></ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5 class="text-center">
+                        <a href="/tags/">FEATURED TAGS</a>
+                    </h5>
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#iOS"
+                           title="iOS">iOS</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+        </div>
+
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- Footer -->
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 text-center">
+                <br>
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/shaqima123">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; Kira&#39;s Tidbits 2018
+                    <br>
+                    <span id="busuanzi_container_site_pv" style="font-size: 12px;">PV: <span id="busuanzi_value_site_pv"></span> Times</span>
+                    <br>
+                    Theme by <a href="https://haojen.github.io/">Haojen Ma</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="/js/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="/js/blog.js"></script>
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://shaqima123.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("//cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+
+<!-- Google Analytics -->
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- swiftype -->
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+  (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+  e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install','','2.0.0');
+</script>
+
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<!--wechat title img-->
+<img class="wechat-title-img" src="https://s1.ax1x.com/2018/12/12/FtUsNd.jpg">
+</body>
+
+</html>
